@@ -1,0 +1,17 @@
+diff --git a/python-package/setup.py b/python-package/setup.py
+index c2e6fd994..14aa3d543 100644
+--- a/python-package/setup.py
++++ b/python-package/setup.py
+@@ -280,12 +280,6 @@ if __name__ == '__main__':
+               'scipy',
+           ],
+           ext_modules=[CMakeExtension('libxgboost')],
+-          cmdclass={
+-              'build_ext': BuildExt,
+-              'sdist': Sdist,
+-              'install_lib': InstallLib,
+-              'install': Install
+-          },
+           extras_require={
+               'pandas': ['pandas'],
+               'scikit-learn': ['scikit-learn'],

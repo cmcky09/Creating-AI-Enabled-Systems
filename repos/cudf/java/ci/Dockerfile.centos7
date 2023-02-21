@@ -1,0 +1,42 @@
+#
+# Copyright (c) 2020-2021, NVIDIA CORPORATION. All rights reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+###
+# Build the image for cudf development environment.
+#
+# Arguments: CUDA_VERSION=11.0, 11.1, 11.2.0 or 11.2.2
+#
+###
+ARG CUDA_VERSION
+FROM nvidia/cuda:$CUDA_VERSION-devel-centos7
+
+### Install basic requirements
+RUN yum install -y centos-release-scl
+RUN yum install -y devtoolset-9 epel-release
+RUN yum install -y git zlib-devel maven tar wget patch
+
+## pre-create the CMAKE_INSTALL_PREFIX folder, set writable by any user for Jenkins
+RUN mkdir /usr/local/rapids && mkdir /rapids && chmod 777 /usr/local/rapids && chmod 777 /rapids
+
+RUN cd /usr/local/ && wget --quiet https://github.com/Kitware/CMake/releases/download/v3.19.0/cmake-3.19.0-Linux-x86_64.tar.gz && \
+   tar zxf cmake-3.19.0-Linux-x86_64.tar.gz
+
+# get GDS user-space lib
+RUN cd /tmp/ && wget https://developer.download.nvidia.com/gds/redist/rel-0.95.1/gds-redistrib-0.95.1.tgz && \
+    tar zxf gds-redistrib-0.95.1.tgz && \
+    cp -R ./gds-redistrib-0.95.1/targets/x86_64-linux/lib/* /usr/local/cuda/targets/x86_64-linux/lib && \
+    cp -R ./gds-redistrib-0.95.1/targets/x86_64-linux/include/* /usr/local/cuda/targets/x86_64-linux/include && \
+    rm -rf gds-redistrib-0.95.1*

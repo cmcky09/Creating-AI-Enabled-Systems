@@ -1,0 +1,44 @@
+# Copyright (c) 2019, NVIDIA CORPORATION.
+
+# Usage:
+#   conda build -c conda-forge .
+{% set version = environ.get('GIT_DESCRIBE_TAG', '0.0.0.dev').lstrip('v') + environ.get('VERSION_SUFFIX', '') %}
+{% set minor_version =  version.split('.')[0] + '.' + version.split('.')[1] %}
+{% set py_version=environ.get('CONDA_PY', 36) %}
+{% set cuda_version=environ.get('CUDA_REL', '0') %}
+
+package:
+  name: clx
+  version: {{ version }}
+
+source:
+  git_url: ../../..
+
+build:
+  number: {{ GIT_DESCRIBE_NUMBER }}
+  string: py{{ py_version }}_{{ GIT_DESCRIBE_HASH }}_{{ GIT_DESCRIBE_NUMBER }}
+  script_env:
+    - VERSION_SUFFIX
+    - CC
+    - CXX
+    - CUDAHOSTCXX
+
+requirements:
+  build:
+    - python
+  run:
+    - python
+    - mkl
+    - scikit-learn>=0.21
+    - cugraph {{ minor_version }}.*
+    - cuml {{ minor_version }}.*
+    - pytorch 1.7.1
+    - torchvision
+    - transformers 4.*
+
+about:
+  home: http://rapids.ai/
+  license: Apache-2.0
+  license_family: Apache
+  license_file: LICENSE
+  summary: clx library
